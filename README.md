@@ -199,5 +199,23 @@ docker build -t xiaomi_ble_temperature_display_for_ha .
 ```
 Running in Docker container
 ```bash
-docker run -e device_mac_addresses=12:34:56:78:90:12,24:68:90:12:34:56 --net=host --privileged --rm xiaomi_ble_temperature_display_for_ha
+docker run -e device_mac_addresses=12:34:56:78:90:12,24:68:90:12:34:56 --name=ble_temperature --net=host --privileged --rm xiaomi_ble_temperature_display_for_ha
+```
+Auto start container with blemqtt.service
+```bash
+[Unit]
+Description=BLE MQTT LYWSD03MMC
+After=network.target
+
+[Service]
+ExecStart=docker run -e device_mac_addresses=12:34:56:78:90:12,24:68:90:12:34:56 --name=ble_temperature --net=host --privileged --rm xiaomi_ble_temperature_display_for_ha
+ExecStop=docker stop ble_temperature
+WorkingDirectory=/home/pi
+StandardOutput=/home/pi/log1.log
+StandardError=/home/pi/log2.log
+Restart=always
+User=pi
+
+[Install]
+WantedBy=multi-user.target
 ```
