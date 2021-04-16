@@ -190,3 +190,14 @@ If all is well you should see something like this:
 
 
 
+
+
+## Docker Wrapper
+Building Docker image
+```bash
+docker build -t xiaomi_ble_temperature_display_for_ha .
+```
+Running in Docker container
+```bash
+docker run -e device_mac_addresses=12:34:56:78:90:12,24:68:90:12:34:56 --net=host --privileged --rm xiaomi_ble_temperature_display_for_ha
+```
