@@ -5,7 +5,6 @@ ENV mqtt_host=not_set
 
 RUN apt update && apt install psmisc
 RUN pip3 install bluepy paho-mqtt
-# RUN git clone https://github.com/AnthonyKNorman/Xiaomi_BLE_Temperature_Display_for_HA.git
 RUN mkdir /xiaomi_ble
 WORKDIR /xiaomi_ble
 COPY LYWSD03MMC.py .
