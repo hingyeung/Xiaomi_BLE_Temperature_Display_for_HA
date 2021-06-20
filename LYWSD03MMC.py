@@ -187,9 +187,9 @@ class MyDelegate(btle.DefaultDelegate):
             measurements.append(measurement)
 
         except Exception as e:
-            print("Fehler")
-            print(e)
-            print(traceback.format_exc())
+            logging.error("Fehler")
+            logging.errror(e)
+            logging.error(traceback.format_exc())
         
 # Initialisation  -------
 
@@ -289,7 +289,10 @@ if args.callback:
 signal.signal(signal.SIGINT, signal_handler)    
 connected=False
 #logging.basicConfig(level=logging.DEBUG)
-logging.basicConfig(level=logging.ERROR)
+logging.basicConfig(
+  format='%(asctime)s %(levelname)-8s %(message)s',
+  level=logging.INFO,
+  datefmt='%Y-%m-%d %H:%M:%S %Z')
 logging.debug("Debug: Starting script...")
 pid=os.getpid()    
 bluepypid=None
@@ -297,7 +300,7 @@ unconnectedTime=None
 
 watchdogThread = threading.Thread(target=watchDog_Thread)
 watchdogThread.start()
-logging.debug("watchdogThread startet")
+logging.debug("watchdogThread started")
 
 while True:
     try:
@@ -311,7 +314,7 @@ while True:
             # else:
                 # print("bluepy-helper couldn't be determined, killing not allowed")
                     
-            print("Trying to connect to " + adress)
+            logging.info("Trying to connect to " + adress)
             p=connect()
             # logging.debug("Own PID: "  + str(pid))
             # pstree=os.popen("pstree -p " + str(pid)).read() #we want to kill only bluepy from our own process tree, because other python scripts have there own bluepy-helper process
@@ -337,7 +340,7 @@ while True:
             
             cnt += 1
             if args.count is not None and cnt >= args.count:
-                print(str(args.count) + " measurements collected. Exiting in a moment.")
+                logging.info(str(args.count) + " measurements collected. Exiting in a moment.")
                 p.disconnect()
                 time.sleep(5)
                 #It seems that sometimes bluepy-helper remains and thus prevents a reconnection, so we try killing our own bluepy-helper
@@ -355,17 +358,17 @@ while True:
                 
                 # send mqtt
                 topic = base_topic + adress.replace(':','')
-                print ('Topic',topic)
+                logging.info ('Topic: ' + topic)
                 
                 print('measurements', measurements)
-                print(measurements[0].temperature)
+                logging.info(measurements[0].temperature)
                 measurement = measurements[0]
 
                 message = '{"temperature": "' + str(measurement.temperature) + '", '
                 message = message + '"humidity": "' + str(measurement.humidity) + '", '
                 message = message + '"batt": "' + str(measurement.battery) + '", '
                 message = message + '"voltage": "' + str(measurement.voltage) + '"}'
-                print('Publishing ' + message)
+                logging.info('Publishing ' + message)
                 publish.single(topic, message, hostname=hostname)
                 cnt = 0         # reset the counter - do not exit
                 measurements.clear()            # clear the measurements array or it will continue to grow
@@ -376,16 +379,15 @@ while True:
                 # end of changes
                 ##############################################################    
 
-            print("")
             continue
     except Exception as e:
-        print("Connection lost")
+        logging.info("Connection lost")
         if connected is True: #First connection abort after connected
             unconnectedTime=int(time.time())
             connected=False
-        time.sleep(1)
-        logging.debug(e)
-        logging.debug(traceback.format_exc())        
+        time.sleep(delay)
+        logging.error(e)
+        logging.error(traceback.format_exc())        
         
-    print ("Waiting...")
+    logging.info("Waiting...")
     # Perhaps do something else here
