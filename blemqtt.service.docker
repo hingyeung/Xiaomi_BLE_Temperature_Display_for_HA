@@ -1,0 +1,15 @@
+[Unit]
+Description=BLE MQTT LYWSD03MMC
+After=network.target
+
+[Service]
+ExecStart=docker run -e device_mac_addresses=<device_1_mac_addr>,<device_2_mac_addr>,<device_3_mac_addr> -e mqtt_host=<mqtt_server_host> --name=ble_temperature --net=host --privileged --rm xiaomi_ble_temperature_display_for_ha
+ExecStop=docker stop ble_temperature
+WorkingDirectory=/home/pi
+StandardOutput=/home/pi/log1.log
+StandardError=/home/pi/log2.log
+Restart=always
+User=pi
+
+[Install]
+WantedBy=multi-user.target
